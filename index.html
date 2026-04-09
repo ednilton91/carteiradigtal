@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gel Massageador Viva Sem Dor - Sistema Blindado</title>
+    <style>
+        :root {
+            --primary: #0f172a; --accent: #6366f1; --success: #10b981;
+            --danger: #ef4444; --bg: #f8fafc; --white: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--primary); display: flex; justify-content: center; overflow-x: hidden; }
+        .app-shell { width: 100%; max-width: 500px; background: var(--white); min-height: 100vh; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding-bottom: 80px; position: relative; }
+
+        header { background: var(--primary); color: white; padding: 25px 20px; border-radius: 0 0 25px 25px; }
+        .app-title { text-align: center; font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; letter-spacing: 1px; color: #6366f1; text-transform: uppercase; }
+        .summary-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .summary-box { flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .summary-box p { font-size: 0.65rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 5px; }
+        .summary-box h2 { font-size: 1.1rem; word-break: break-all; }
+
+        .main-total { text-align: center; margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+        .main-total h1 { font-size: 1.8rem; color: #fff; word-break: break-all; }
+
+        .nav-tabs { display: flex; background: white; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0; }
+        .nav-item { flex: 1; padding: 15px 0; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: bold; transition: 0.3s; position: relative; }
+        .nav-item svg { display: block; width: 22px; height: 22px; margin: 0 auto 5px; fill: currentColor; }
+        .nav-item.active { color: var(--accent); background: rgba(99, 102, 241, 0.05); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 3px; background: var(--accent); border-radius: 10px 10px 0 0; }
+
+        .section { display: none; padding: 20px; }
+        .section.active { display: block; }
+
+        .card { background: #f1f5f9; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        .group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; }
+        
+        .share-zone { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .backup-zone { display: flex; gap: 8px; margin-bottom: 15px; }
+        
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-save { background: var(--accent); color: white; }
+        .btn-wa { background: #10b981; color: white; }
+        .btn-copy { background: #64748b; color: white; }
+        .btn-reset { background: rgba(255,255,255,0.1); color: white; font-size: 0.7rem; width: auto; padding: 8px 15px; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px; }
+        .btn-util { background: #e2e8f0; color: var(--primary); font-size: 0.7rem; padding: 8px; }
+
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid #eee; }
+        .item-content { flex-grow: 1; cursor: pointer; overflow: hidden; }
+        .item-content b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-icon { cursor: pointer; padding: 8px; border-radius: 6px; background: #f1f5f9; border: none; margin-left: 5px; min-width: 32px; }
+        
+        .cat-tag { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; color: #475569; margin-left: 5px; }
+        .transf-badge { background: #64748b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-right: 5px; }
+        .suggest { position: absolute; width: 100%; background: white; border: 1px solid #ddd; z-index: 100; border-radius: 8px; display: none; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .suggest-div { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <header>
+        <div class="app-title">Gel Massageador Viva Sem Dor</div>
+        <div class="summary-container">
+            <div class="summary-box"><p>Ganhos (+)</p><h2 id="res-in" style="color:var(--success)">R$ 0,00</h2></div>
+            <div class="summary-box"><p>Gastos (-)</p><h2 id="res-out" style="color:var(--danger)">R$ 0,00</h2></div>
+        </div>
+        <div class="main-total">
+            <p style="font-size: 0.6rem; opacity: 0.7; color: #fff;">SALDO TOTAL</p>
+            <h1 id="res-total">R$ 0,00</h1>
+            <button class="btn btn-reset" onclick="resetCounters()">Zerar Visual</button>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <div class="nav-item active" onclick="tab('home')"><svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>Extrato</div>
+        <div class="nav-item" onclick="tab('action')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Lançar</div>
+        <div class="nav-item" onclick="tab('banks')"><svg viewBox="0 0 24 24"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z"/></svg>Bancos</div>
+        <div class="nav-item" onclick="tab('cats')"><svg viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>Cats</div>
+        <div class="nav-item" onclick="tab('clients')"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Clientes</div>
+    </nav>
+
+    <section id="tab-home" class="section active">
+        <div class="backup-zone">
+            <button class="btn btn-util" onclick="exportBackup()">💾 Backup</button>
+            <button class="btn btn-util" onclick="document.getElementById('importFile').click()">📂 Restaurar</button>
+            <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
+        </div>
+        <div class="group">
+            <input type="text" id="search-extrato" placeholder="🔍 Pesquisar cliente ou observação..." onkeyup="render()">
+        </div>
+        <div id="share-zone" class="share-zone">
+            <button class="btn btn-wa" onclick="shareWA()">WhatsApp</button>
+            <button class="btn btn-copy" onclick="copyRel()">Copiar</button>
+        </div>
+        <div id="list-history"></div>
+    </section>
+
+    <section id="tab-action" class="section">
+        <div class="card">
+            <input type="hidden" id="edit-trans-id">
+            <div class="group"><label>Operação</label><select id="f-type" onchange="toggleForm()"><option value="in">Entrada (+)</option><option value="out">Saída (-)</option><option value="transf">Transferência (⇄)</option></select></div>
+            <div id="field-std">
+                <div class="group" style="position:relative"><label>Cliente</label><input type="text" id="f-client" autocomplete="off" onkeyup="searchSuggest(this.value)"><div id="suggest-box" class="suggest"></div></div>
+                <div class="group"><label>Categoria</label><select id="f-cat"></select></div>
+            </div>
+            <div class="group"><label id="label-orig">Banco</label><select id="f-bank"></select></div>
+            <div id="field-dest" style="display:none"><div class="group"><label>Destino</label><select id="f-bank-dest"></select></div></div>
+            <div class="group"><label>Valor (Ex: 1.132,01)</label>
+                <input type="text" id="f-val" placeholder="0,00" oninput="formatInputBRL(this)">
+            </div>
+            <div class="group"><label>Observação</label><input type="text" id="f-obs"></div>
+            <button class="btn btn-save" id="btn-save-trans" onclick="saveTransaction()">Gravar Lançamento</button>
+        </div>
+    </section>
+
+    <section id="tab-banks" class="section">
+        <div class="card">
+            <input type="hidden" id="edit-bank-id">
+            <div class="group"><label>Nome do Banco</label><input type="text" id="in-bank-name"></div>
+            <div class="group"><label>Saldo Inicial</label>
+                <input type="text" id="in-bank-balance" placeholder="0,00" oninput="formatInputBRL(this)">
+            </div>
+            <button class="btn btn-save" onclick="saveBank()">Gravar Banco</button>
+        </div>
+        <div id="list-banks"></div>
+    </section>
+
+    <section id="tab-cats" class="section">
+        <div class="card">
+            <input type="hidden" id="edit-cat-id">
+            <div class="group"><label>Nome da Categoria</label><input type="text" id="in-cat-name"></div>
+            <button class="btn btn-save" onclick="saveCat()">Gravar Categoria</button>
+        </div>
+        <div id="list-cats"></div>
+    </section>
+
+    <section id="tab-clients" class="section">
+        <div class="card">
+            <input type="hidden" id="edit-client-id">
+            <div class="group"><label>Nome do Cliente</label><input type="text" id="in-client-name"></div>
+            <div class="group"><label>Endereço / Contato</label><input type="text" id="in-client-addr"></div>
+            <button class="btn btn-save" onclick="saveClient()">Gravar Cliente</button>
+        </div>
+        <div id="list-clients"></div>
+    </section>
+</div>
+
+<script>
+    // Versão do Banco de Dados para evitar conflitos de cache
+    const DB_KEY = 'gel_viva_db_v_final';
+    
+    let db = { banks: [], clients: [], categories: [{id:1, name:'Venda'}], history: [], offsetIn: 0, offsetOut: 0 };
+
+    // Inicialização segura
+    try {
+        const saved = localStorage.getItem(DB_KEY);
+        if(saved) db = JSON.parse(saved);
+    } catch(e) { console.error("Erro ao carregar DB"); }
+
+    function sync() { 
+        localStorage.setItem(DB_KEY, JSON.stringify(db)); 
+        render(); 
+    }
+
+    // Lógica sólida de tratamento de moeda (1.132,01)
+    function parseBRL(v) {
+        if (!v) return 0;
+        if (typeof v === 'number') return v;
+        let clean = v.replace(/[R$\s]/g, '');
+        if (clean.includes('.') && clean.includes(',')) clean = clean.replace(/\./g, '').replace(',', '.');
+        else clean = clean.replace(',', '.');
+        return parseFloat(clean) || 0;
+    }
+
+    function formatBRL(n) {
+        return (Number(n) || 0).toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function formatInputBRL(el) {
+        let v = el.value.replace(/\D/g, "");
+        if (v.length > 2) {
+            let dec = v.slice(-2);
+            let int = v.slice(0, -2);
+            el.value = parseInt(int).toLocaleString('pt-br') + "," + dec;
+        } else if (v.length > 0) {
+            el.value = "0," + v.padStart(2, '0');
+        }
+    }
+
+    function tab(id) {
+        document.querySelectorAll('.section, .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + id).classList.add('active');
+        const map = { home:0, action:1, banks:2, cats:3, clients:4 };
+        const items = document.querySelectorAll('.nav-item');
+        if(items[map[id]]) items[map[id]].classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function exportBackup() {
+        const data = JSON.stringify(db);
+        const blob = new Blob([data], {type: "application/json"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `backup_viva_dor_${new Date().getTime()}.json`;
+        a.click();
+    }
+
+    function importBackup(e) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const imported = JSON.parse(ev.target.result);
+                if(imported.history) { db = imported; sync(); alert("Dados restaurados!"); }
+            } catch(err) { alert("Arquivo inválido!"); }
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
+    function resetCounters() {
+        if(!confirm("Deseja zerar os contadores visuais de ganhos e gastos?")) return;
+        let tin = 0, tout = 0;
+        db.history.forEach(h => { if(!h.isT) { if(h.type === 'in') tin += h.val; else tout += h.val; } });
+        db.offsetIn = tin; db.offsetOut = tout; sync();
+    }
+
+    function saveBank() {
+        const n = document.getElementById('in-bank-name').value.trim();
+        const b = parseBRL(document.getElementById('in-bank-balance').value);
+        const id = document.getElementById('edit-bank-id').value;
+        if(!n) return alert("Digite o nome do banco!");
+        if(id) db.banks = db.banks.map(x => x.id == id ? {id: Number(id), name: n, balance: b} : x);
+        else db.banks.push({id: Date.now(), name: n, balance: b});
+        document.getElementById('in-bank-name').value = ''; document.getElementById('in-bank-balance').value = ''; document.getElementById('edit-bank-id').value = '';
+        sync();
+    }
+
+    function saveCat() {
+        const n = document.getElementById('in-cat-name').value.trim();
+        const id = document.getElementById('edit-cat-id').value;
+        if(!n) return;
+        if(id) db.categories = db.categories.map(x => x.id == id ? {id: Number(id), name: n} : x);
+        else db.categories.push({id: Date.now(), name: n});
+        document.getElementById('in-cat-name').value = ''; document.getElementById('edit-cat-id').value = '';
+        sync();
+    }
+
+    function saveClient() {
+        const n = document.getElementById('in-client-name').value.trim();
+        const a = document.getElementById('in-client-addr').value.trim();
+        const id = document.getElementById('edit-client-id').value;
+        if(!n) return alert("Digite o nome!");
+        if(id) db.clients = db.clients.map(x => x.id == id ? {id: Number(id), name: n, addr: a} : x);
+        else db.clients.push({id: Date.now(), name: n, addr: a});
+        document.getElementById('in-client-name').value = ''; document.getElementById('in-client-addr').value = ''; document.getElementById('edit-client-id').value = '';
+        sync();
+    }
+
+    function saveTransaction() {
+        const val = parseBRL(document.getElementById('f-val').value);
+        const type = document.getElementById('f-type').value;
+        const bOrig = document.getElementById('f-bank').value;
+        const editId = document.getElementById('edit-trans-id').value;
+
+        if(val <= 0 || !bOrig) return alert("Verifique o valor e o banco!");
+
+        if(editId) { undoEffect(editId); db.history = db.history.filter(h => h.id != editId); }
+
+        if(type === 'transf') {
+            const bDest = document.getElementById('f-bank-dest').value;
+            if(bOrig === bDest) return alert("Bancos devem ser diferentes!");
+            db.banks = db.banks.map(b => {
+                if(b.name === bOrig) b.balance -= val;
+                if(b.name === bDest) b.balance += val;
+                return b;
+            });
+            db.history.push({ id: editId ? Number(editId) : Date.now(), type, client: 'Sistema', bank: bOrig, bankDest: bDest, cat: 'Transf.', val, obs: document.getElementById('f-obs').value, date: new Date().toLocaleDateString('pt-br'), isT: true });
+        } else {
+            db.banks = db.banks.map(b => { if(b.name === bOrig) b.balance += (type === 'in' ? val : -val); return b; });
+            db.history.push({ id: editId ? Number(editId) : Date.now(), type, client: document.getElementById('f-client').value || 'Geral', bank: bOrig, cat: document.getElementById('f-cat').value, val, obs: document.getElementById('f-obs').value, date: new Date().toLocaleDateString('pt-br'), isT: false });
+        }
+        
+        // Limpeza e volta
+        document.getElementById('f-val').value = ''; document.getElementById('f-client').value = ''; 
+        document.getElementById('f-obs').value = ''; document.getElementById('edit-trans-id').value = '';
+        document.getElementById('btn-save-trans').innerText = "Gravar Lançamento";
+        sync(); tab('home');
+    }
+
+    function undoEffect(id) {
+        const t = db.history.find(h => h.id == id);
+        if(!t) return;
+        if(t.isT) {
+            db.banks = db.banks.map(b => { if(b.name === t.bank) b.balance += t.val; if(b.name === t.bankDest) b.balance -= t.val; return b; });
+        } else {
+            db.banks = db.banks.map(b => { if(b.name === t.bank) b.balance -= (t.type === 'in' ? t.val : -t.val); return b; });
+        }
+    }
+
+    function deleteTrans(id) { if(confirm("Deseja excluir este registro permanentemente?")) { undoEffect(id); db.history = db.history.filter(h => h.id != id); sync(); } }
+
+    function editTrans(id) {
+        const t = db.history.find(h => h.id == id);
+        if(!t) return;
+        tab('action');
+        document.getElementById('edit-trans-id').value = t.id;
+        document.getElementById('f-type').value = t.type;
+        toggleForm();
+        document.getElementById('f-val').value = formatBRL(t.val);
+        document.getElementById('f-bank').value = t.bank;
+        document.getElementById('f-obs').value = t.obs;
+        if(!t.isT) { document.getElementById('f-client').value = t.client; document.getElementById('f-cat').value = t.cat; }
+        else { document.getElementById('f-bank-dest').value = t.bankDest; }
+        document.getElementById('btn-save-trans').innerText = "Atualizar Lançamento";
+    }
+
+    function toggleForm() {
+        const t = document.getElementById('f-type').value;
+        document.getElementById('field-std').style.display = t === 'transf' ? 'none' : 'block';
+        document.getElementById('field-dest').style.display = t === 'transf' ? 'block' : 'none';
+    }
+
+    function buildReport(name) {
+        const filtered = db.history.filter(h => h.client.toLowerCase() === name.toLowerCase());
+        if(!filtered.length) return "";
+        let total = 0, text = `*RELATÓRIO VIVA SEM DOR*\nCliente: ${name.toUpperCase()}\n\n`;
+        filtered.forEach(h => {
+            let sinal = h.type === 'in' ? '(+)' : '(-)';
+            text += `📅 ${h.date} | ${h.bank}${h.isT?' -> '+h.bankDest:''} [${h.cat}]: ${sinal} R$ ${formatBRL(h.val)}\n`;
+            if(!h.isT) total += (h.type === 'in' ? h.val : -h.val);
+        });
+        text += `\n*TOTAL ACUMULADO: R$ ${formatBRL(total)}*`;
+        return text;
+    }
+
+    function shareWA() { 
+        const txt = buildReport(document.getElementById('search-extrato').value);
+        if(txt) window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`); 
+    }
+
+    function copyRel() { 
+        const txt = buildReport(document.getElementById('search-extrato').value);
+        if(!txt) return;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(txt).then(() => alert("Relatório copiado!")).catch(() => fallbackCopy(txt));
+        } else {
+            fallbackCopy(txt);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
+        alert("Relatório copiado!");
+    }
+
+    function safeDel(coll, id) {
+        const item = db[coll].find(x => x.id === id);
+        const inUse = db.history.some(h => h.bank === item.name || h.bankDest === item.name || h.cat === item.name);
+        if(inUse) return alert("Não é possível excluir: Este item possui lançamentos vinculados!");
+        if(confirm("Excluir este item?")) { db[coll] = db[coll].filter(x => x.id !== id); sync(); }
+    }
+
+    function searchSuggest(v) {
+        const box = document.getElementById('suggest-box');
+        if(!v) { box.style.display = 'none'; return; }
+        const match = db.clients.filter(c => c.name.toLowerCase().includes(v.toLowerCase()));
+        box.innerHTML = match.map(m => `<div class="suggest-div" onclick="document.getElementById('f-client').value='${m.name}';document.getElementById('suggest-box').style.display='none'">${m.name}</div>`).join('');
+        box.style.display = match.length ? 'block' : 'none';
+    }
+
+    function render() {
+        let tin = 0, tout = 0;
+        db.history.forEach(t => { if(!t.isT) { if(t.type === 'in') tin += t.val; else tout += t.val; } });
+        
+        document.getElementById('res-in').innerText = `R$ ${formatBRL(tin - db.offsetIn)}`;
+        document.getElementById('res-out').innerText = `R$ ${formatBRL(tout - db.offsetOut)}`;
+        document.getElementById('res-total').innerText = `R$ ${formatBRL(db.banks.reduce((acc, b) => acc + b.balance, 0))}`;
+
+        const bankOpts = db.banks.length ? db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join('') : '<option value="">Cadastre um banco</option>';
+        document.getElementById('f-bank').innerHTML = bankOpts;
+        document.getElementById('f-bank-dest').innerHTML = bankOpts;
+        document.getElementById('f-cat').innerHTML = db.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+        document.getElementById('list-banks').innerHTML = db.banks.map(b => `<div class="item"><div><b>${b.name}</b><br><small>Saldo: R$ ${formatBRL(b.balance)}</small></div><div><button class="btn-icon" onclick="document.getElementById('edit-bank-id').value='${b.id}'; document.getElementById('in-bank-name').value='${b.name}'; document.getElementById('in-bank-balance').value='${formatBRL(b.balance)}'">✏️</button><button class="btn-icon" onclick="safeDel('banks',${b.id})">🗑️</button></div></div>`).join('');
+        document.getElementById('list-cats').innerHTML = db.categories.map(c => `<div class="item"><span>${c.name}</span><div><button class="btn-icon" onclick="document.getElementById('edit-cat-id').value='${c.id}'; document.getElementById('in-cat-name').value='${c.name}'">✏️</button><button class="btn-icon" onclick="safeDel('categories',${c.id})">🗑️</button></div></div>`).join('');
+        document.getElementById('list-clients').innerHTML = db.clients.map(c => `<div class="item"><div><b>${c.name}</b><br><small>${c.addr || ''}</small></div><div><button class="btn-icon" onclick="document.getElementById('edit-client-id').value='${c.id}'; document.getElementById('in-client-name').value='${c.name}'; document.getElementById('in-client-addr').value='${c.addr}'">✏️</button><button class="btn-icon" onclick="safeDel('clients',${c.id})">🗑️</button></div></div>`).join('');
+        
+        const search = document.getElementById('search-extrato').value.toLowerCase();
+        const clientExists = db.clients.some(c => c.name.toLowerCase() === search);
+        document.getElementById('share-zone').style.display = (search && clientExists) ? 'grid' : 'none';
+
+        const filtered = search ? db.history.filter(h => h.client.toLowerCase().includes(search) || h.obs.toLowerCase().includes(search) || h.bank.toLowerCase().includes(search)) : db.history;
+        
+        document.getElementById('list-history').innerHTML = [...filtered].reverse().slice(0, 100).map(t => `
+            <div class="item">
+                <div class="item-content" onclick="document.getElementById('search-extrato').value='${t.client}'; render();">
+                    ${t.isT?'<span class="transf-badge">⇄</span>':''}<b>${t.client}</b><span class="cat-tag">${t.cat}</span><br>
+                    <small>${t.bank}${t.isT?' → '+t.bankDest:''} • ${t.date} ${t.obs? ' | '+t.obs:''}</small>
+                </div>
+                <div style="text-align:right">
+                    <b style="color:${t.isT?'#64748b':(t.type=='in'?'var(--success)':'var(--danger)')}">${t.isT?'':(t.type=='in'?'+':'-')} R$ ${formatBRL(t.val)}</b><br>
+                    <button class="btn-icon" onclick="editTrans(${t.id})">✏️</button>
+                    <button class="btn-icon" onclick="deleteTrans(${t.id})">🗑️</button>
+                </div>
+            </div>`).join('');
+    }
+
+    // Fecha sugestões ao clicar fora
+    document.addEventListener('click', (e) => {
+        if(e.target.id !== 'f-client') document.getElementById('suggest-box').style.display = 'none';
+    });
+
+    render();
+</script>
+</body>
+</html>
